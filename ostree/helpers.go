@@ -1,6 +1,7 @@
 package ostree
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -8,7 +9,8 @@ import (
 
 func GetBootedCommit() (commit string, err error) {
 	var cmdOut []byte
-	if cmdOut, err = exec.Command("ostree", "admin", "status").Output(); err != nil {
+	if cmdOut, err = exec.Command("ostree", "admin", "status").CombinedOutput(); err != nil {
+		err = errors.New(string(cmdOut))
 		return
 	}
 
@@ -26,9 +28,10 @@ func GetBootedCommit() (commit string, err error) {
 	return
 }
 
-func GetTag(ref, tag string) (value string, err error) {
+func GetMetadata(ref, key string) (value string, err error) {
 	var cmdOut []byte
-	if cmdOut, err = exec.Command("ostree", "show", fmt.Sprintf("--print-metadata-key=%s", tag), ref).Output(); err != nil {
+	if cmdOut, err = exec.Command("ostree", "show", fmt.Sprintf("--print-metadata-key=%s", key), ref).CombinedOutput(); err != nil {
+		err = errors.New(string(cmdOut))
 		return
 	}
 	value = strings.TrimSpace(string(cmdOut))
@@ -36,7 +39,7 @@ func GetTag(ref, tag string) (value string, err error) {
 	return
 }
 
-func GetVersionTag(ref string) (version string, err error) {
-	version, err = GetTag(ref, "version")
+func GetCommitVersion(ref string) (version string, err error) {
+	version, err = GetMetadata(ref, "version")
 	return
 }

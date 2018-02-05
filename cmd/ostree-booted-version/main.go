@@ -14,7 +14,7 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Printf("Booted commit hash: %s\n", commit)
-	version, err := ostree.GetVersionTag(commit)
+	version, err := ostree.GetCommitVersion(commit)
 	if err != nil {
 		fmt.Println("Commit has no version tag, using the first 6 characters of the commit hash instead.")
 		version = commit[:6]
